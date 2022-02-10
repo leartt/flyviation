@@ -9,6 +9,10 @@ require('dotenv').config({
 // initialize express
 const app = express();
 
+// middlewares
+app.use(express.json());
+app.use(cors());
+
 const FLIGHT_API_URL = "https://data-live.flightradar24.com/zones/fcgi/feed.js?faa=1&bounds=57.282%2C36.847%2C0.178%2C27.247&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&estimated=1&maxage=14400";
 
 app.get('/', (req, res) => {
