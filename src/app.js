@@ -8,6 +8,7 @@ require('dotenv').config({
 });
 
 const airports = require('./data/airports.json');
+const aircrafts = require('./data/aircrafts.json');
 
 // initialize express
 const app = express();
@@ -16,7 +17,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const FLIGHT_API_URL = "https://data-live.flightradar24.com/zones/fcgi/feed.js?faa=1&bounds=57.282%2C36.847%2C0.178%2C27.247&satellite=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&estimated=1&maxage=14400";
+const FLIGHT_API_URL = "https://data-live.flightradar24.com/zones/fcgi/feed.js?faa=1&bounds=57.282%2C36.847%2C0.178%2C27.247&satellite=1&mlat=1&flarm=1&adsb=1&gnd=0&air=1&estimated=1&maxage=14400";
 
 app.get('/', async (req, res) => {
 
@@ -34,14 +35,16 @@ app.get('/api/v1/flights', async (req, res) => {
 
                 const departureAirport = airports.find(airport => airport.iata == data[11]);
                 const arrivalAirport = airports.find(airport => airport.iata == data[12]);
+                const aircraft = aircrafts.find(aircraft => aircraft.icaoCode == data[8]);
 
                 return {
+                    flightId: data[0],
                     lat: data[1],
                     long: data[2],
                     angle: data[3],
                     altitude: data[4],
                     speed: data[5],
-                    aircraftCode: data[8],
+                    aircraft: aircraft,
                     departure: departureAirport,
                     arrival: arrivalAirport,
                     flightNumber: data[13],
@@ -51,7 +54,7 @@ app.get('/api/v1/flights', async (req, res) => {
             }
         })
 
-        return res.status(200).json(flights);
+        return res.status(200).json({ success: true, flights });
 
     } catch (error) {
         return res.status(500).json({
