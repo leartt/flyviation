@@ -28,23 +28,26 @@ app.get('/api/v1/flights', async (req, res) => {
     try {
         const { data: originalData } = await axios.get(FLIGHT_API_URL);
 
-        // data returned as object with unique key (value as array)
-        // need to manipulate data and make ready for frontend
-        const flights = Object.values(originalData).map(data => {
-            if (Array.isArray(data)) {
+        // get flightIds and skip 2 first elements not needed
+        const flightIds = Object.keys(originalData).slice(2);
 
-                const departureAirport = airports.find(airport => airport.iata == data[11]);
-                const arrivalAirport = airports.find(airport => airport.iata == data[12]);
-                const aircraft = aircrafts.find(aircraft => aircraft.icaoCode == data[8]);
+        /* data returned as object with unique key (value as array)
+            need to manipulate data and make ready for frontend */
+        let flightIndex = 0;
+        const flights = Object.values(originalData).map((data, idx) => {
+            if (Array.isArray(data)) {
+                // const departureAirport = airports.find(airport => airport.iata == data[11]);
+                // const arrivalAirport = airports.find(airport => airport.iata == data[12]);
+                // const aircraft = aircrafts.find(aircraft => aircraft.icaoCode == data[8]);
 
                 return {
-                    flightId: data[0],
+                    flightId: flightIds[flightIndex++],
                     lat: data[1],
                     long: data[2],
                     angle: data[3],
                     altitude: data[4],
                     speed: data[5],
-                    aircraft: aircraft,
+                    aircraft: data[8],
                     departure: departureAirport,
                     arrival: arrivalAirport,
                     flightNumber: data[13],
