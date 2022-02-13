@@ -48,8 +48,8 @@ app.get('/api/v1/flights', async (req, res) => {
                     altitude: data[4],
                     speed: data[5],
                     aircraft: data[8],
-                    departure: departureAirport,
-                    arrival: arrivalAirport,
+                    // departure: departureAirport,
+                    // arrival: arrivalAirport,
                     flightNumber: data[13],
                     alternativeFlightNumber: data[16],
                     airlineCode: data[18],
@@ -66,6 +66,69 @@ app.get('/api/v1/flights', async (req, res) => {
         })
     }
 })
+
+app.get("/api/v1/flights/:id", async (req, res) => {
+    try {
+        const { id } = req.params
+        const { data } =
+            await axios.get(`https://data-live.flightradar24.com/clickhandler/?&flight=${id}`);
+
+        const flight = {
+            id: data.identification?.id,
+            callsign: data.identification.callsign,
+            flightNumber: data.identification.number.default,
+            status: {
+                live: data.status.live,
+                text: data.status.text
+            },
+            aircraft: {
+                code: data.aircraft.model.code,
+                text: data.aircraft.model.text,
+                registration: data.aircraft.registration,
+                imageUrl: data.aircraft.images?.large[0]?.src
+            },
+            airline: {
+                name: data.airline.name,
+                iata: data.airline.code?.iata,
+                icao: data.airline.code?.icao,
+            },
+            departure: {
+                name: data.airport.origin.name,
+                iata: data.airport.origin.code.iata,
+                icao: data.airport.origin.code.icao,
+                latitute: data.airport.origin.position.latitude,
+                longitude: data.airport.origin.position.longitude,
+                country: {
+                    name: data.airport.origin.position.country.name,
+                    code: data.airport.origin.position.country.code,
+                    city: data.airport.origin.position.country.city
+                }
+            },
+            arrival: {
+                name: data.airport.destination.name,
+                iata: data.airport.destination.code.iata,
+                icao: data.airport.destination.code.icao,
+                latitute: data.airport.destination.position.latitude,
+                longitude: data.airport.destination.position.longitude,
+                country: {
+                    name: data.airport.destination.position.country.name,
+                    code: data.airport.destination.position.country.code,
+                    city: data.airport.destination.position.country.city
+                }
+            },
+            time: data.time,
+        }
+
+        return res.status(200).json({ success: true, flight })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : null
+        })
+    }
+})
+
 
 const PORT = process.env.PORT || 5500;
 
