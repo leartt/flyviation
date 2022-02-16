@@ -8,7 +8,6 @@ require('dotenv').config({
 });
 
 const airports = require('./data/airports.json');
-const aircrafts = require('./data/aircrafts.json');
 
 // initialize express
 const app = express();
