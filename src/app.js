@@ -45,8 +45,8 @@ app.get('/api/v1/flights', async (req, res) => {
                     lat: data[1],
                     long: data[2],
                     angle: data[3],
-                    altitude: data[4],
-                    speed: data[5],
+                    altitude: Math.round(Number(data[4] / 3.281)), // convert from ft to meters
+                    speed: Math.round(Number(data[5] * 1.852)), // convert from knots to kmh
                     aircraft: data[8],
                     // departure: departureAirport,
                     // arrival: arrivalAirport,
@@ -69,11 +69,15 @@ app.get('/api/v1/flights', async (req, res) => {
 
 app.get("/api/v1/flights/:id", async (req, res) => {
     try {
-        const { id } = req.params
-        const { data } =
-            await axios.get(`https://data-live.flightradar24.com/clickhandler/?&flight=${id}`);
+        const { id } = req.params;
+
+        const { data: flights } = await axios.get("http://localhost:5500/api/v1/flights");
+        const specificFlight = flights.flights.find(f => f?.flightId === id);
+
+        const { data } = await axios.get(`https://data-live.flightradar24.com/clickhandler/?&flight=${specificFlight.flightId}`);
 
         const flight = {
+            ...specificFlight,
             id: data.identification?.id,
             callsign: data.identification.callsign,
             flightNumber: data.identification.number.default,
@@ -101,7 +105,12 @@ app.get("/api/v1/flights/:id", async (req, res) => {
                 country: {
                     name: data.airport.origin.position.country.name,
                     code: data.airport.origin.position.country.code,
-                    city: data.airport.origin.position.country.city
+                    city: data.airport.origin.position.region.city
+                },
+                timezone: {
+                    name: data.airport.origin.timezone.name,
+                    offset: data.airport.origin.timezone.offset / 60, // convert from sec to mins
+                    offsetHours: data.airport.origin.timezone.offsetHours
                 }
             },
             arrival: {
@@ -113,10 +122,16 @@ app.get("/api/v1/flights/:id", async (req, res) => {
                 country: {
                     name: data.airport.destination.position.country.name,
                     code: data.airport.destination.position.country.code,
-                    city: data.airport.destination.position.country.city
+                    city: data.airport.destination.position.region.city
+                },
+                timezone: {
+                    name: data.airport.destination.timezone.name,
+                    offset: data.airport.destination.timezone.offset / 60, // convert from sec to mins
+                    offsetHours: data.airport.destination.timezone.offsetHours
                 }
             },
             time: data.time,
+            trails: data.trail.map(trail => [trail["lat"], trail["lng"]])
         }
 
         return res.status(200).json({ success: true, flight })
