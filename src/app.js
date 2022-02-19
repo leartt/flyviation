@@ -7,8 +7,6 @@ require('dotenv').config({
     path: path.join(__dirname, "../.env")
 });
 
-const airports = require('./data/airports.json');
-
 // initialize express
 const app = express();
 
@@ -16,12 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const FLIGHT_API_URL = "https://data-live.flightradar24.com/zones/fcgi/feed.js?faa=1&bounds=57.282%2C36.847%2C0.178%2C27.247&satellite=1&mlat=1&flarm=1&adsb=1&gnd=0&air=1&estimated=1&maxage=14400";
-
-app.get('/', async (req, res) => {
-
-    return res.json(airports);
-})
+const FLIGHT_API_URL = process.env.FLIGHT_API_URL;
 
 app.get('/api/v1/flights', async (req, res) => {
     try {
@@ -70,7 +63,7 @@ app.get("/api/v1/flights/:id", async (req, res) => {
     try {
         const { id } = req.params;
 
-        const { data: flights } = await axios.get("http://localhost:5500/api/v1/flights");
+        const { data: flights } = await axios.get(`http://localhost:${PORT}/api/v1/flights`);
         const specificFlight = flights.flights.find(f => f?.flightId === id);
 
         const { data } = await axios.get(`https://data-live.flightradar24.com/clickhandler/?&flight=${specificFlight.flightId}`);
@@ -109,6 +102,7 @@ app.get("/api/v1/flights/:id", async (req, res) => {
                 timezone: {
                     name: data.airport.origin.timezone.name,
                     offset: data.airport.origin.timezone.offset / 60, // convert from sec to mins
+                    abbr: data.airport.origin.timezone.abbr,
                     offsetHours: data.airport.origin.timezone.offsetHours
                 }
             },
@@ -126,6 +120,7 @@ app.get("/api/v1/flights/:id", async (req, res) => {
                 timezone: {
                     name: data.airport.destination.timezone.name,
                     offset: data.airport.destination.timezone.offset / 60, // convert from sec to mins
+                    abbr: data.airport.destination.timezone.abbr,
                     offsetHours: data.airport.destination.timezone.offsetHours
                 }
             },
@@ -141,6 +136,10 @@ app.get("/api/v1/flights/:id", async (req, res) => {
             stack: process.env.NODE_ENV === 'development' ? error.stack : null
         })
     }
+})
+
+app.get("*", (req, res) => {
+    return res.status(404).end("404. Not found")
 })
 
 
