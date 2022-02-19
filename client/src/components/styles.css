@@ -1,0 +1,164 @@
+.SpecificFlight {
+    position: fixed;
+    display: block;
+    top: 10px;
+    left: 10px;
+    border-radius: 10px;
+    max-width: 300px;
+    /* width: 100%; */
+    padding: 5px 0;
+    background: white;
+    z-index: 100000;
+    overflow: scroll;
+    box-shadow: 10px 10px 50px -35px black;
+    font-size: 1.1em;
+    cursor: auto;
+}
+
+.SpecificFlight--upper {
+    padding: 5px;
+    position: relative;
+    color: rgb(228, 137, 0);
+}
+
+.SpecificFlight--upper .close-btn {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    font-size: 2em;
+    padding: 0 5px;
+    cursor: pointer;
+}
+
+.SpecificFlight--upper .flight-number {
+    font-weight: bold;
+    padding-right: 2px;
+    font-size: 1.2em;
+}
+
+.SpecificFlight--upper .flight-airline {
+    color: #000;
+}
+
+.SpecificFlight__img {
+    max-width: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.SpecificFlight--airport {
+    display: flex;
+    flex: 1;
+    text-align: center;
+}
+
+.SpecificFlight--airport .timezone {
+    font-size: 0.8em;
+    color: rgb(140, 140, 140);
+}
+
+.SpecificFlight--airport .departure,
+.SpecificFlight--airport .arrival {
+    flex: 1;
+    background: rgb(232, 232, 232);
+    box-shadow: 0 0 5px -3px black;
+}
+
+.SpecificFlight--airport .departure .iata,
+.SpecificFlight--airport .arrival .iata {
+    font-size: 2em;
+}
+
+.SpecificFlight--airport .departure .city,
+.SpecificFlight--airport .arrival .city {
+    text-transform: uppercase;
+}
+
+.SpecificFlight--airport .departure {
+    margin-right: 5px;
+}
+
+.SpecificFlight--airport .scheduled-time {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 5px;
+    /* background: rgb(48, 48, 48); */
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+}
+
+.SpecificFlight--airport .SpecificFlight .loading--icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px !important;
+}
+
+.SpecificFlight--aircraft {
+    display: flex;
+    font-size: 1.1em;
+}
+
+.SpecificFlight--aircraft>div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    flex: 1;
+    padding: 5px;
+}
+
+.SpecificFlight--info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 5px;
+}
+
+.divider {
+    max-width: 100%;
+    width: 100%;
+    height: 5px;
+    background: rgb(228, 137, 0);
+}
+
+@media screen and (max-width: 600px) {
+    .SpecificFlight {
+        max-width: 100%;
+        width: 100%;
+        font-size: 1em;
+        height: min-content;
+        top: unset;
+        left: 0;
+        bottom: 0;
+    }
+
+    .SpecificFlight__container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+    }
+
+    .SpecificFlight--upper {
+        font-size: 1.5em;
+    }
+
+    .SpecificFlight__img {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .divider {
+        display: none;
+    }
+
+    .SpecificFlight--aircraft {
+        display: none;
+    }
+
+    .SpecificFlight--info {
+        /* place-items: center; */
+        align-items: center;
+        background-color: rgb(228, 137, 0);
+        color: white
+    }
+
+}
